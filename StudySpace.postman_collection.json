@@ -1,0 +1,642 @@
+{
+  "info": {
+    "_postman_id": "studyspace-api-collection-v1",
+    "name": "StudySpace API Collection",
+    "description": "Comprehensive REST API test collection for StudySpace — Personal AI Learning Platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. System Health & Diagnostics",
+      "item": [
+        {
+          "name": "Get Application Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            },
+            "description": "Verifies that the backend is operational and SQLite database is connected."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Subjects, Chapters & Topics",
+      "item": [
+        {
+          "name": "Get Curriculum Tree",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Subject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Computer Science\",\n  \"description\": \"Core systems, algorithms and architecture\",\n  \"color\": \"#4F46E5\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Chapter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject_id\": 1,\n  \"name\": \"Operating Systems\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/chapters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", "chapters"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Topic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chapter_id\": 1,\n  \"name\": \"Virtual Memory\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/topics",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", "topics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Topic Completion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/topics/1/toggle-complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", "topics", "1", "toggle-complete"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Safe Delete Subject (Keep materials unassigned)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"unassign\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Study Materials & Import",
+      "item": [
+        {
+          "name": "List Materials with Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials?sort_by=recent",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials"],
+              "query": [
+                {
+                  "key": "sort_by",
+                  "value": "recent"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Import Public Webpage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://en.wikipedia.org/wiki/Operating_system\",\n  \"title\": \"Wikipedia: Operating Systems Overview\",\n  \"tags\": \"OS, Foundations\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/import-url",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "import-url"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Material Detail & Sections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Material (Rename / Move)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Study Material Title\",\n  \"is_favorite\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Bookmark to Material Section",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"material_id\": 1,\n  \"section_id\": 1,\n  \"title\": \"Core Definition Bookmark\",\n  \"note\": \"Review for exam\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/materials/1/bookmarks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials", "1", "bookmarks"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Personal Notes",
+      "item": [
+        {
+          "name": "List Notes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Virtual Memory Paging\",\n  \"content\": \"Paging allows the physical address space of a process to be noncontiguous.\",\n  \"is_pinned\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/notes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Note (Autosave)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated note body with additional memory management formulas.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/notes/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Convert Note to Flashcard",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notes/1/to-flashcard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notes", "1", "to-flashcard"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Flashcards & Spaced Repetition",
+      "item": [
+        {
+          "name": "List Flashcards",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/flashcards?due_only=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "flashcards"],
+              "query": [
+                {
+                  "key": "due_only",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Flashcard",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What is Thrashing in Virtual Memory?\",\n  \"answer\": \"A state where the CPU spends more time paging than executing processes.\",\n  \"tag\": \"OS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/flashcards",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "flashcards"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Flashcard Review (SM-2 Rating)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": \"good\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/flashcards/1/review",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "flashcards", "1", "review"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Quizzes & Assessments",
+      "item": [
+        {
+          "name": "List Quizzes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/quizzes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quizzes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Memory Management Quiz\",\n  \"difficulty\": \"medium\",\n  \"questions\": [\n    {\n      \"question_type\": \"mcq\",\n      \"question_text\": \"Which page replacement algorithm suffers from Belady's anomaly?\",\n      \"options\": [\"FIFO\", \"LRU\", \"Optimal\", \"Clock\"],\n      \"correct_answer\": \"FIFO\",\n      \"explanation\": \"First-In-First-Out can exhibit Belady's anomaly where adding frames increases page faults.\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/quizzes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quizzes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Quiz Attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": {\n    \"1\": \"FIFO\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/quizzes/1/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quizzes", "1", "attempt"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Global Search",
+      "item": [
+        {
+          "name": "Search Across Library, Notes, and Cards",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/search?q=Memory",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Learning Progress & Sessions",
+      "item": [
+        {
+          "name": "Get Learning Progress Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/progress/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "progress", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Study Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"material_id\": 1,\n  \"activity_type\": \"reading\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/progress/session/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "progress", "session", "start"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "End Study Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/progress/session/end",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "progress", "session", "end"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. AI Learning Tools",
+      "item": [
+        {
+          "name": "Get AI Configuration Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Explain Passage Simply",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Thrashing occurs when a computer's virtual memory subsystem is in a constant state of paging.\",\n  \"style\": \"simple\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/explain",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "explain"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ask Question Grounded in Material (RAG)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"material_id\": 1,\n  \"question\": \"What are the main causes of thrashing?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/ask",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ai", "ask"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10. System Backups & Restoration",
+      "item": [
+        {
+          "name": "List Backups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/backups",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "backups"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Trigger Instant Backup",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system/backup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "system", "backup"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

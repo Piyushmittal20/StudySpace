@@ -1,0 +1,341 @@
+/* StudySpace — Google Clean Material & Minimalist Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  
+  /* Google Core Brand Colors */
+  --google-blue: #4285F4;
+  --google-blue-dark: #1a73e8;
+  --google-blue-subtle: #e8f0fe;
+  
+  --google-red: #EA4335;
+  --google-red-dark: #d93025;
+  --google-red-subtle: #fce8e6;
+  
+  --google-yellow: #FBBC05;
+  --google-yellow-dark: #b06000;
+  --google-yellow-subtle: #fef7e0;
+  
+  --google-green: #34A853;
+  --google-green-dark: #1e8e3e;
+  --google-green-subtle: #e6f4ea;
+
+  /* Refined Google Action & Neutral Palette */
+  --primary: #1a73e8;        /* Google Primary Action Blue */
+  --primary-hover: #1557b0;
+  --primary-active: #0d47a1;
+  --primary-subtle: #e8f0fe; /* Google subtle blue tint */
+  --bg-main: #f8fafd;        /* Clean, bright canvas */
+  --bg-surface: #ffffff;
+  --bg-hover: #f1f3f4;       /* Google standard hover grey */
+  --text-main: #202124;      /* Google High-Contrast Charcoal */
+  --text-subtle: #3c4043;    /* Google Secondary Slate */
+  --text-muted: #5f6368;     /* Google Muted / Labels */
+  --border-subtle: #dadce0;  /* Google crisp light border */
+}
+
+/* Base Body Typography */
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.003em;
+}
+
+/* Ensure inputs, buttons, select, and textarea inherit the Inter font and default size */
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+/* Precise Font Size Hierarchy (Inter / Jira specs) */
+.text-xs {
+  font-size: 12px !important;
+  line-height: 16px !important;
+}
+
+.text-sm {
+  font-size: 14px !important;
+  line-height: 20px !important;
+}
+
+.text-base {
+  font-size: 16px !important;
+  line-height: 24px !important;
+}
+
+.text-lg {
+  font-size: 18px !important;
+  line-height: 26px !important;
+}
+
+.text-xl {
+  font-size: 20px !important;
+  line-height: 28px !important;
+  letter-spacing: -0.01em;
+}
+
+.text-2xl {
+  font-size: 24px !important;
+  line-height: 32px !important;
+  letter-spacing: -0.015em;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Markdown preview formatting inside reading view (matching Jira document typography) */
+.study-content {
+  font-family: var(--reader-font-family, var(--font-family));
+  font-size: var(--reader-font-size, 14px);
+  line-height: var(--reader-line-height, 1.75);
+  color: var(--text-main);
+}
+
+.study-content p {
+  margin-bottom: 1.25rem;
+  line-height: 1.75;
+  color: var(--text-main);
+}
+
+.study-content h1, .study-content h2, .study-content h3 {
+  color: var(--text-main);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.study-content h1 { font-size: 22px; line-height: 28px; }
+.study-content h2 { font-size: 18px; line-height: 24px; }
+.study-content h3 { font-size: 16px; line-height: 22px; }
+
+.study-content ul, .study-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.7;
+  color: var(--text-main);
+}
+
+.study-content ul { list-style-type: disc; }
+.study-content ol { list-style-type: decimal; }
+
+.study-content blockquote {
+  border-left: 3px solid var(--primary);
+  padding: 0.6rem 1rem;
+  font-style: normal;
+  color: var(--text-subtle);
+  margin: 1.25rem 0;
+  background-color: var(--bg-hover);
+  border-radius: 0 4px 4px 0;
+}
+
+.study-content pre {
+  background: #091e42;
+  color: #f7f8f9;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.study-content code {
+  background: #f1f2f4;
+  color: var(--text-main);
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Smooth modal animations */
+.modal-backdrop {
+  backdrop-filter: blur(2px);
+  background-color: rgba(9, 30, 66, 0.45);
+}
+
+/* Tree view connector line */
+.tree-node-children {
+  position: relative;
+  padding-left: 1.25rem;
+  margin-left: 0.75rem;
+  border-left: 1.5px solid var(--border-subtle);
+}
+
+/* Rich Note Contenteditable Area */
+.note-rich-editor {
+  outline: none;
+  min-height: 250px;
+  line-height: 1.6;
+  color: var(--text-main);
+  font-family: var(--font-family);
+  font-size: 14px;
+}
+
+.note-rich-editor:empty:before {
+  content: attr(placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+  display: block;
+}
+
+.note-rich-editor p {
+  margin-bottom: 0.75rem;
+}
+
+.note-rich-editor ul, .note-rich-editor ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.note-rich-editor ul { list-style-type: disc; }
+.note-rich-editor ol { list-style-type: decimal; }
+
+/* Sidebar Navigation Items: Matching Jira Product Discovery Sidebar */
+aside button[data-nav-view],
+#mobile-nav-drawer button[data-nav-view] {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 20px !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  color: var(--text-subtle);
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+aside button[data-nav-view]:hover,
+#mobile-nav-drawer button[data-nav-view]:hover {
+  background-color: var(--bg-hover) !important;
+  color: var(--text-main) !important;
+}
+
+/* Active tab style matching "All ideas" in screenshot: light blue tint + blue text + left accent indicator */
+aside button[data-nav-view].nav-active,
+#mobile-nav-drawer button[data-nav-view].nav-active {
+  background-color: var(--primary-subtle) !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+  border-left: 3px solid var(--primary) !important;
+  padding-left: 9px !important;
+}
+
+aside button[data-nav-view].nav-active svg,
+#mobile-nav-drawer button[data-nav-view].nav-active svg {
+  color: var(--primary) !important;
+}
+
+aside button[data-nav-view] svg,
+#mobile-nav-drawer button[data-nav-view] svg {
+  color: var(--text-muted);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+/* Google Signature Subtle Brand Colors on Nav Icons */
+aside button[data-nav-view="dashboard"] svg, #mobile-nav-drawer button[data-nav-view="dashboard"] svg { color: var(--google-blue) !important; }
+aside button[data-nav-view="library"] svg, #mobile-nav-drawer button[data-nav-view="library"] svg { color: var(--google-green) !important; }
+aside button[data-nav-view="subjects"] svg, #mobile-nav-drawer button[data-nav-view="subjects"] svg { color: var(--google-yellow-dark) !important; }
+aside button[data-nav-view="study-room"] svg, #mobile-nav-drawer button[data-nav-view="study-room"] svg { color: var(--google-blue) !important; }
+aside button[data-nav-view="notes"] svg, #mobile-nav-drawer button[data-nav-view="notes"] svg { color: var(--google-yellow-dark) !important; }
+aside button[data-nav-view="quizzes"] svg, #mobile-nav-drawer button[data-nav-view="quizzes"] svg { color: var(--google-green) !important; }
+aside button[data-nav-view="progress"] svg, #mobile-nav-drawer button[data-nav-view="progress"] svg { color: var(--google-red) !important; }
+aside button[data-nav-view="calendar"] svg, #mobile-nav-drawer button[data-nav-view="calendar"] svg { color: var(--google-blue) !important; }
+aside button[data-nav-view="settings"] svg, #mobile-nav-drawer button[data-nav-view="settings"] svg { color: var(--text-muted) !important; }
+
+aside button[data-nav-view] > * {
+  pointer-events: none;
+}
+
+/* Inline Notes Split Layout (65% hierarchy + topic / 35% rich notes editor) */
+@media (min-width: 1024px) {
+  #subjects-main-pane.split-active {
+    width: 65% !important;
+    max-width: 65% !important;
+  }
+  #subjects-note-sidebar.split-active {
+    width: 35% !important;
+    max-width: 35% !important;
+    display: block !important;
+  }
+}
+
+/* Squeezed / Collapsed Sidebar Navigation */
+#app-sidebar {
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden;
+}
+
+#app-sidebar.sidebar-collapsed {
+  width: 4.25rem !important; /* ~68px compact dock */
+  min-width: 4.25rem !important;
+}
+
+#app-sidebar.sidebar-collapsed .nav-label {
+  display: none !important;
+}
+
+#app-sidebar.sidebar-collapsed #sidebar-header-row {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#app-sidebar.sidebar-collapsed > div.p-3,
+#app-sidebar.sidebar-collapsed #sidebar-footer-row {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+#app-sidebar.sidebar-collapsed [data-nav-view] {
+  justify-content: center !important;
+  padding: 8px 0 !important;
+  gap: 0 !important;
+  width: 100% !important;
+  border-left-width: 0 !important;
+  border-radius: 8px !important;
+}
+
+#app-sidebar.sidebar-collapsed [data-nav-view] svg {
+  margin: 0 auto !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+}
+
+#app-sidebar.sidebar-collapsed [data-nav-view].nav-active {
+  background-color: var(--primary-subtle) !important;
+  color: var(--primary) !important;
+  border-radius: 8px !important;
+  border-left-width: 0 !important;
+}
+
+

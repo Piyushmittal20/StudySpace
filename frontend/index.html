@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudySpace — Personal AI Learning Platform</title>
+  <!-- Google Fonts: Inter (Matching Jira / Atlassian Design System) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="/css/style.css?v=18">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Oxygen', 'Ubuntu', '"Fira Sans"', '"Droid Sans"', '"Helvetica Neue"', 'sans-serif']
+          },
+          colors: {
+            jira: {
+              blue: '#0c66e4',
+              blueHover: '#0055cc',
+              blueActive: '#09326c',
+              blueSubtle: '#e9f2ff',
+              text: '#172b4d',
+              subtle: '#44546f',
+              muted: '#626f86',
+              border: '#dcdfe4',
+              bg: '#f7f8f9',
+              hover: '#f1f2f4'
+            },
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#0c66e4',
+              600: '#0055cc',
+              700: '#09326c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#f7f8f9] text-[#172b4d] min-h-screen flex flex-col font-sans antialiased text-sm">
+
+  <!-- Top Navigation Bar with Google Accent Line -->
+  <header class="bg-white border-b border-[#dadce0] sticky top-0 z-40 shadow-xs">
+    <!-- Signature Google 4-Color Accent Line (Subtle & Crisp) -->
+    <div class="h-[3px] w-full" style="background: linear-gradient(90deg, #4285F4 0% 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75% 100%);"></div>
+    <div class="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+      <!-- Left: Logo, Mobile Toggle & Back/Forward Navigation Controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button onclick="App.toggleMobileNav()" class="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer" title="Toggle menu">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div onclick="App.navigateTo('dashboard')" class="flex items-center gap-2.5 cursor-pointer mr-1" title="Go to Dashboard">
+          <div class="w-8 h-8 rounded-lg bg-white border border-[#dadce0] p-1 flex items-center justify-center shadow-xs">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="#34A853" stroke-width="2"/>
+              <path d="M9 7h6" stroke="#EA4335" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9 11h4" stroke="#FBBC05" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="font-bold text-sm text-[#202124] tracking-tight">StudySpace</span>
+        </div>
+      </div>
+
+      <!-- Center: Global Search Bar -->
+      <div class="relative flex-1 max-w-xl mx-2">
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#5f6368]">
+            <svg class="w-4 h-4 text-[#4285F4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </span>
+          <input id="global-search-input" type="text"
+            placeholder="Search for anything"
+            class="w-full pl-9 pr-12 py-1.5 text-sm bg-[#f8fafd] border border-[#dadce0] rounded-md text-[#202124] placeholder-[#5f6368] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 focus:border-[#4285F4] transition">
+          <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs text-[#5f6368] font-mono">
+            Ctrl+K
+          </span>
+        </div>
+        <!-- Search Results Dropdown -->
+        <div id="global-search-results" class="hidden absolute left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-[#dadce0] overflow-hidden z-50"></div>
+      </div>
+
+      <!-- Right: User-Controlled Stopwatch/Timer & Add Study Material Button -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <!-- Customizable Stopwatch / Timer Button -->
+        <button id="top-stopwatch-btn" type="button" onclick="window.TimerWidget && window.TimerWidget.toggleModal()"
+          title="Click to configure stopwatch or countdown timer"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[#dadce0] bg-white hover:bg-[#f1f3f4] text-sm font-medium text-[#202124] shadow-xs transition cursor-pointer">
+          <svg class="w-4 h-4 text-[#34A853]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span id="top-timer-display">Timer: 25:00</span>
+        </button>
+
+        <button onclick="App.openAddMaterialModal()"
+          class="px-3.5 py-1.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-sm font-medium rounded-md shadow-xs transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+          <span>+</span>
+          <span>Add Study Material</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div id="mobile-nav-drawer" class="hidden md:hidden bg-white border-b border-[#dcdfe4] px-4 py-3 space-y-1">
+    <button data-nav-view="dashboard" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">Dashboard</button>
+    <button data-nav-view="library" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">My Library</button>
+    <button data-nav-view="subjects" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">Subjects & Topics</button>
+    <button data-nav-view="study-room" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">Study Room</button>
+    <button data-nav-view="notes" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">Notes</button>
+    <button data-nav-view="quizzes" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">Quizzes</button>
+    <button data-nav-view="progress" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">Learning Progress</button>
+    <button data-nav-view="calendar" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">Calendar</button>
+    <button data-nav-view="settings" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4]">Settings</button>
+  </div>
+
+  <!-- Main Layout Container (Sidebar docked touching left, top header bar, and bottom of page) -->
+  <div class="w-full flex-1 flex min-h-[calc(100vh-3.5rem)]">
+    <!-- Desktop Sidebar Navigation (Menu box touching left edge, top bar, and bottom of screen) -->
+    <aside id="app-sidebar" class="hidden md:flex flex-col justify-between w-60 shrink-0 bg-white border-r border-[#dcdfe4] h-[calc(100vh-3.5rem)] sticky top-14 z-30 transition-all duration-200">
+      <!-- Top Section: Toggle Squeeze Button & Navigation Links -->
+      <div class="p-3 flex flex-col flex-1 overflow-y-auto">
+        <div class="flex items-center justify-end px-2 py-1.5 mb-2 border-b border-[#f1f2f4]" id="sidebar-header-row">
+          <button id="sidebar-toggle-btn" onclick="App.toggleSidebar()" title="Collapse sidebar" aria-label="Collapse sidebar" class="p-1.5 rounded-md text-[#626f86] hover:text-[#172b4d] hover:bg-[#f1f2f4] transition cursor-pointer">
+            <svg id="sidebar-toggle-icon" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect>
+              <line x1="8.5" y1="3" x2="8.5" y2="21"></line>
+              <path id="sidebar-toggle-chevron" d="M15 9.5L12.5 12l2.5 2.5"></path>
+            </svg>
+          </button>
+        </div>
+        <nav class="space-y-1" id="sidebar-nav-list">
+          <button data-nav-view="dashboard" title="Dashboard" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-semibold bg-[#e9f2ff] text-[#0c66e4] border-l-[3px] border-[#0c66e4] transition cursor-pointer text-left nav-active">
+            <svg class="w-4 h-4 text-[#0c66e4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <span class="nav-label">Dashboard</span>
+          </button>
+          <button data-nav-view="library" title="My Library" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4] hover:text-[#172b4d] border-l-[3px] border-transparent transition cursor-pointer text-left">
+            <svg class="w-4 h-4 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span class="nav-label">My Library</span>
+          </button>
+          <button data-nav-view="subjects" title="Subjects & Topics" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4] hover:text-[#172b4d] border-l-[3px] border-transparent transition cursor-pointer text-left">
+            <svg class="w-4 h-4 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+            <span class="nav-label">Subjects & Topics</span>
+          </button>
+          <button data-nav-view="study-room" title="Study Room" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4] hover:text-[#172b4d] border-l-[3px] border-transparent transition cursor-pointer text-left">
+            <svg class="w-4 h-4 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span class="nav-label">Study Room</span>
+          </button>
+          <button data-nav-view="notes" title="Notes" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4] hover:text-[#172b4d] border-l-[3px] border-transparent transition cursor-pointer text-left">
+            <svg class="w-4 h-4 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            <span class="nav-label">Notes</span>
+          </button>
+          <button data-nav-view="quizzes" title="Quizzes" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4] hover:text-[#172b4d] border-l-[3px] border-transparent transition cursor-pointer text-left">
+            <svg class="w-4 h-4 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            <span class="nav-label">Quizzes</span>
+          </button>
+          <button data-nav-view="progress" title="Learning Progress" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4] hover:text-[#172b4d] border-l-[3px] border-transparent transition cursor-pointer text-left">
+            <svg class="w-4 h-4 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <span class="nav-label">Learning Progress</span>
+          </button>
+          <button data-nav-view="calendar" title="Calendar" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4] hover:text-[#172b4d] border-l-[3px] border-transparent transition cursor-pointer text-left">
+            <svg class="w-4 h-4 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="8" y1="2" x2="8" y2="6" stroke-width="2" stroke-linecap="round"></line>
+              <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"></line>
+            </svg>
+            <span class="nav-label">Calendar</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom Section: Settings Button pinned to the bottom of the menu box -->
+      <div class="p-3 border-t border-[#dcdfe4]" id="sidebar-footer-row">
+        <button data-nav-view="settings" title="Settings" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-[#44546f] hover:bg-[#f1f2f4] hover:text-[#172b4d] border-l-[3px] border-transparent transition cursor-pointer text-left">
+          <svg class="w-4 h-4 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span class="nav-label">Settings</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Stage -->
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+      <div class="max-w-7xl mx-auto">
+
+      <!-- View 1: Dashboard -->
+      <section id="view-dashboard" class="view-section space-y-6">
+        <div id="dashboard-continue-learning"></div>
+        <div id="dashboard-calendar-events"></div>
+        <div id="dashboard-revision-alerts"></div>
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-semibold text-[#172b4d]">My Subjects</h3>
+            <button onclick="App.navigateTo('subjects')" class="text-xs text-[#0c66e4] hover:text-[#0055cc] font-semibold cursor-pointer">
+              Manage Subjects →
+            </button>
+          </div>
+          <div id="dashboard-subjects-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </section>
+
+      <!-- View 2: My Library -->
+      <section id="view-library" class="view-section hidden space-y-4">
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-4 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <input id="library-search" type="text" placeholder="Filter materials..."
+              oninput="Library.applyFilters()"
+              class="text-xs p-2 rounded-lg border border-[#DCDFE4] focus:outline-[#0c66e4] w-44 text-[#172b4d]">
+
+            <select id="library-filter-subject" onchange="Library.applyFilters()"
+              class="subject-select-picker text-xs p-2 rounded-lg border border-[#DCDFE4] focus:outline-[#0c66e4] text-[#172b4d]">
+              <option value="">All Subjects</option>
+            </select>
+
+            <select id="library-filter-type" onchange="Library.applyFilters()"
+              class="text-xs p-2 rounded-lg border border-[#DCDFE4] focus:outline-[#0c66e4] text-[#172b4d]">
+              <option value="">All Types</option>
+              <option value="pdf">PDF</option>
+              <option value="docx">Word (.docx)</option>
+              <option value="pptx">PowerPoint (.pptx)</option>
+              <option value="txt">Text (.txt)</option>
+              <option value="md">Markdown (.md)</option>
+              <option value="xlsx">Excel (.xlsx)</option>
+              <option value="web">Web Article</option>
+              <option value="video">Video</option>
+            </select>
+
+            <label class="flex items-center gap-1.5 text-xs text-[#44546f] cursor-pointer ml-1 font-medium">
+              <input id="library-filter-fav" type="checkbox" onchange="Library.applyFilters()" class="rounded text-[#0c66e4] focus:ring-0">
+              <span>Favorites Only</span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <span id="library-count-badge" class="text-xs text-[#626f86] font-medium"></span>
+            <select id="library-filter-sort" onchange="Library.applyFilters()"
+              class="text-xs p-1.5 rounded-lg border border-[#DCDFE4] focus:outline-[#0c66e4] text-[#172b4d]">
+              <option value="recent">Recently Added</option>
+              <option value="opened">Recently Opened</option>
+              <option value="title">Alphabetical (A-Z)</option>
+            </select>
+
+            <div class="flex items-center bg-[#F1F2F4] p-0.5 rounded-lg border border-[#DCDFE4]">
+              <button id="lib-view-grid-btn" onclick="Library.setViewMode('grid')" class="p-1.5 rounded bg-white text-[#172b4d] shadow-xs cursor-pointer" title="Grid View">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              </button>
+              <button id="lib-view-list-btn" onclick="Library.setViewMode('list')" class="p-1.5 rounded text-[#626f86] hover:text-[#172b4d] cursor-pointer" title="List View">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="library-items-container"></div>
+      </section>
+
+      <!-- View 3: Subjects & Topics -->
+      <section id="view-subjects" class="view-section hidden space-y-4">
+        <div class="flex items-center justify-between pb-2">
+          <div>
+            <h2 class="text-xl font-semibold text-[#172b4d]">Curriculum Hierarchy</h2>
+            <p class="text-xs text-[#626f86]">Subject → Chapter → Topic → Study Material</p>
+          </div>
+          <button onclick="Subjects.openAddSubjectModal()"
+            class="px-3.5 py-1.5 bg-[#0c66e4] text-white rounded-lg text-xs font-semibold hover:bg-[#0055cc] transition cursor-pointer">
+            + New Subject
+          </button>
+        </div>
+
+        <!-- Split Layout: Main Curriculum Pane (100% or 65%) + Inline Notes Sidebar (35%) -->
+        <div id="subjects-layout-wrapper" class="flex flex-col lg:flex-row gap-5 items-start transition-all duration-300">
+          <div id="subjects-main-pane" class="w-full transition-all duration-300">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+              <div class="lg:col-span-5" id="subjects-tree-container"></div>
+              <div class="lg:col-span-7" id="topic-detail-container"></div>
+            </div>
+          </div>
+
+          <!-- Inline Note Editor Sidebar (35% width when opened) -->
+          <div id="subjects-note-sidebar" class="hidden w-full lg:w-[35%] shrink-0 transition-all duration-300">
+            <div id="subjects-note-editor-container" class="bg-white rounded-xl border border-[#DCDFE4] shadow-xs flex flex-col sticky top-20 overflow-hidden">
+              <!-- Rendered dynamically by Subjects.renderInlineNoteEditor -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 4: Study Room -->
+      <section id="view-study-room" class="view-section hidden">
+        <div id="study-room-container"></div>
+      </section>
+
+      <!-- View 5: Notes -->
+      <section id="view-notes" class="view-section hidden">
+        <div class="bg-white rounded-xl border border-[#DCDFE4] shadow-xs overflow-hidden grid grid-cols-1 md:grid-cols-12 h-[calc(100vh-8.5rem)]">
+          <div class="md:col-span-4 border-r border-[#DCDFE4] flex flex-col bg-[#F7F8F9]">
+            <div class="p-3 border-b border-[#DCDFE4] flex items-center justify-between bg-white">
+              <h3 class="font-semibold text-sm text-[#172b4d]">My Notes</h3>
+              <button onclick="Notes.createNewNote()" class="px-2.5 py-1 bg-[#0c66e4] text-white rounded text-xs font-semibold hover:bg-[#0055cc] transition cursor-pointer">
+                + New
+              </button>
+            </div>
+            <div class="p-2 border-b border-[#DCDFE4] bg-white">
+              <input id="notes-search" type="text" placeholder="Search notes..."
+                oninput="Notes.applyFilters()"
+                class="w-full p-2 text-xs rounded border border-[#DCDFE4] focus:outline-[#0c66e4] bg-white text-[#172b4d]">
+            </div>
+            <div id="notes-list" class="flex-1 overflow-y-auto"></div>
+          </div>
+
+          <div class="md:col-span-8 flex flex-col bg-white" id="notes-editor-pane"></div>
+        </div>
+      </section>
+
+      <!-- View 6: Quizzes -->
+      <section id="view-quizzes" class="view-section hidden space-y-4">
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-4 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-semibold text-[#172b4d]">Practice Quizzes</h2>
+            <p class="text-xs text-[#626f86]">10-question practice tests with progressive difficulty</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="Quizzes.openAIGeneratorModal()" class="px-3.5 py-1.5 bg-[#0c66e4] text-white rounded-lg text-xs font-semibold hover:bg-[#0055cc] transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>+ Generate AI Quiz</span>
+            </button>
+            <button onclick="Quizzes.openCreateModal()" class="px-3 py-1.5 border border-[#DCDFE4] hover:bg-[#F1F2F4] text-[#172b4d] rounded-lg text-xs font-semibold transition cursor-pointer">
+              + Manual Quiz
+            </button>
+          </div>
+        </div>
+
+        <div id="quizzes-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      <!-- View 7: Progress -->
+      <section id="view-progress" class="view-section hidden">
+        <div id="progress-view-content"></div>
+      </section>
+
+      <!-- View: Calendar & Important Dates -->
+      <section id="view-calendar" class="view-section hidden space-y-5">
+        <!-- Main Calendar & Agenda Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Left: Month Calendar Card (8 cols) -->
+          <div class="lg:col-span-8 bg-white rounded-xl border border-[#dcdfe4] shadow-xs overflow-hidden flex flex-col">
+            <!-- Calendar Navigation Header -->
+            <div class="px-4 sm:px-5 py-3 border-b border-[#f1f2f4] flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 sm:gap-3">
+                <h3 id="calendar-month-title" class="text-base font-bold text-[#172b4d]">November 2026</h3>
+                <button onclick="CalendarView.goToToday()" class="px-2.5 py-1 text-xs font-semibold rounded-md border border-[#dcdfe4] text-[#44546f] hover:text-[#172b4d] hover:bg-[#f1f2f4] transition cursor-pointer">Today</button>
+                <div class="flex items-center gap-0.5">
+                  <button onclick="CalendarView.prevMonth()" title="Previous month" class="p-1.5 rounded-md text-[#626f86] hover:text-[#172b4d] hover:bg-[#f1f2f4] transition cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                  </button>
+                  <button onclick="CalendarView.nextMonth()" title="Next month" class="p-1.5 rounded-md text-[#626f86] hover:text-[#172b4d] hover:bg-[#f1f2f4] transition cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <button onclick="CalendarView.openEventModal()" class="px-3.5 py-1.5 bg-[#0c66e4] hover:bg-[#0055cc] text-white text-xs font-semibold rounded-lg shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Mark Event</span>
+              </button>
+            </div>
+
+            <!-- Days of Week Header -->
+            <div class="grid grid-cols-7 border-b border-[#f1f2f4] bg-[#fafbfc] text-center text-xs font-semibold text-[#626f86] py-2">
+              <div>Sun</div>
+              <div>Mon</div>
+              <div>Tue</div>
+              <div>Wed</div>
+              <div>Thu</div>
+              <div>Fri</div>
+              <div>Sat</div>
+            </div>
+
+            <!-- Month Days Grid -->
+            <div id="calendar-grid-cells" class="grid grid-cols-7 bg-[#f1f2f4] gap-[1px]"></div>
+          </div>
+
+          <!-- Right: Selected Date Agenda & Upcoming Deadlines (4 cols) -->
+          <div class="lg:col-span-4 space-y-4">
+            <!-- Selected Date Card -->
+            <div class="bg-white rounded-xl border border-[#dcdfe4] shadow-xs p-4 flex flex-col">
+              <div class="flex items-center justify-between pb-3 border-b border-[#f1f2f4] mb-3">
+                <div>
+                  <span class="text-[11px] font-semibold uppercase tracking-wider text-[#626f86]">Selected Date</span>
+                  <h4 id="calendar-agenda-date-label" class="text-sm font-bold text-[#172b4d] mt-0.5">Today</h4>
+                </div>
+                <button onclick="CalendarView.openEventModal()" title="Add event on this date" class="p-1.5 rounded-md bg-[#e9f2ff] text-[#0c66e4] hover:bg-[#0c66e4] hover:text-white transition cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </button>
+              </div>
+              <div id="calendar-selected-agenda" class="flex-1 overflow-y-auto max-h-[300px]"></div>
+            </div>
+
+            <!-- Upcoming Important Dates Card -->
+            <div class="bg-white rounded-xl border border-[#dcdfe4] shadow-xs p-4 flex flex-col">
+              <div class="flex items-center justify-between pb-3 border-b border-[#f1f2f4] mb-3">
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-[#626f86]">Upcoming Milestones</span>
+                <span class="text-xs text-[#0c66e4] font-semibold">Next 30 Days</span>
+              </div>
+              <div id="calendar-upcoming-list" class="space-y-2"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 8: Settings -->
+      <section id="view-settings" class="view-section hidden space-y-6">
+        <!-- Page Title Header -->
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold text-[#172b4d]">Application Settings</h2>
+            <p class="text-xs text-[#626f86] mt-0.5">Customize your personal study profile, reading comfort, timer preferences, and data backups.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="Settings.resetToDefaults()" class="px-3 py-1.5 border border-[#DCDFE4] hover:bg-[#F1F2F4] text-xs font-medium text-[#172b4d] rounded-lg transition cursor-pointer">
+              Reset to Defaults
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. Learner Profile & Study Targets -->
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-6 shadow-xs">
+          <div class="pb-3 mb-4 border-b border-[#DCDFE4]">
+            <h3 class="font-semibold text-lg text-[#172b4d]">Learner Profile & Daily Study Goal</h3>
+            <p class="text-xs text-[#626f86] mt-0.5">Personalize your student identity and daily study targets tracked on your dashboard.</p>
+          </div>
+
+          <form onsubmit="Settings.saveProfileSettings(event)" class="space-y-4 max-w-2xl">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Student / Display Name</label>
+                <input id="pref-student-name" type="text" placeholder="e.g. Anand"
+                  class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+                <span class="text-[11px] text-[#626f86] mt-1 block">Displayed on your Dashboard and session overviews.</span>
+              </div>
+
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Daily Study Target</label>
+                <select id="pref-daily-target"
+                  class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4] bg-white cursor-pointer">
+                  <option value="30">30 minutes / day (Light)</option>
+                  <option value="45">45 minutes / day (Consistent)</option>
+                  <option value="60" selected>60 minutes / day (Recommended)</option>
+                  <option value="90">90 minutes / day (Deep Focus)</option>
+                  <option value="120">120 minutes / day (Intensive)</option>
+                  <option value="180">180 minutes / day (Exam Prep)</option>
+                </select>
+                <span class="text-[11px] text-[#626f86] mt-1 block">Your daily completion ring adapts to this target.</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-semibold text-[#172b4d] block mb-1">Primary Focus Subject</label>
+              <select id="pref-focus-subject"
+                class="subject-select-picker w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4] bg-white cursor-pointer">
+                <option value="">All Subjects (Balanced)</option>
+              </select>
+              <span class="text-[11px] text-[#626f86] mt-1 block">Prioritizes this subject when surfacing recommendations.</span>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="px-4 py-2 bg-[#0c66e4] hover:bg-[#0055cc] text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+                Save Profile & Targets
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 2. Reading Room & Typography Preferences -->
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-6 shadow-xs">
+          <div class="pb-3 mb-4 border-b border-[#DCDFE4]">
+            <h3 class="font-semibold text-lg text-[#172b4d]">Study Room & Reading Comfort</h3>
+            <p class="text-xs text-[#626f86] mt-0.5">Customize font size, line spacing, and typeface to match your visual comfort.</p>
+          </div>
+
+          <form onsubmit="Settings.saveReadingSettings(event)" class="space-y-4 max-w-2xl">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Font Family</label>
+                <select id="pref-reader-font-family" onchange="Settings.updateReadingPreview()"
+                  class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4] bg-white cursor-pointer">
+                  <option value="sans">System Sans-Serif (Clean)</option>
+                  <option value="serif">Editorial Serif (Bookish)</option>
+                  <option value="mono">Technical Monospace (Code)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Text Size</label>
+                <select id="pref-reader-font-size" onchange="Settings.updateReadingPreview()"
+                  class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4] bg-white cursor-pointer">
+                  <option value="13">Small (13px)</option>
+                  <option value="14" selected>Standard (14px)</option>
+                  <option value="16">Comfortable (16px)</option>
+                  <option value="18">Large (18px)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Line Spacing</label>
+                <select id="pref-reader-line-height" onchange="Settings.updateReadingPreview()"
+                  class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4] bg-white cursor-pointer">
+                  <option value="1.5">Compact (1.5)</option>
+                  <option value="1.75" selected>Relaxed (1.75)</option>
+                  <option value="2.0">Spacious (2.0)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-1">
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-[#172b4d]">
+                <input id="pref-reader-autoscroll" type="checkbox" checked
+                  class="rounded border-[#DCDFE4] text-[#0c66e4] focus:ring-[#0c66e4]">
+                <span>Automatically scroll to top when advancing sections</span>
+              </label>
+
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-[#172b4d]">
+                <input id="pref-reader-show-badges" type="checkbox" checked
+                  class="rounded border-[#DCDFE4] text-[#0c66e4] focus:ring-[#0c66e4]">
+                <span>Show slide and page count badges in table of contents</span>
+              </label>
+            </div>
+
+            <!-- Live Reading Typography Preview Box -->
+            <div class="mt-3 p-4 rounded-lg bg-[#F7F8F9] border border-[#DCDFE4]">
+              <span class="text-[11px] font-semibold text-[#626f86] uppercase tracking-wider block mb-1.5">Live Reading Preview</span>
+              <p id="reader-live-preview-text" class="text-[#172b4d]">
+                StudySpace is designed for focused, distraction-free learning. This live preview shows how sections, study slides, and notes will appear in your Study Room reader.
+              </p>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="px-4 py-2 bg-[#0c66e4] hover:bg-[#0055cc] text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+                Apply Reading Comfort
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 3. Focus Timer & Alerts -->
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-6 shadow-xs">
+          <div class="pb-3 mb-4 border-b border-[#DCDFE4]">
+            <h3 class="font-semibold text-lg text-[#172b4d]">Focus Timer & Audio Alerts</h3>
+            <p class="text-xs text-[#626f86] mt-0.5">Configure your default study session duration, countdown mode, and completion sound.</p>
+          </div>
+
+          <form onsubmit="Settings.saveTimerSettings(event)" class="space-y-4 max-w-2xl">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Default Timer Mode</label>
+                <select id="pref-timer-default-mode"
+                  class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4] bg-white cursor-pointer">
+                  <option value="timer" selected>Countdown Timer (Pomodoro)</option>
+                  <option value="stopwatch">Open-ended Stopwatch</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Default Countdown Duration</label>
+                <select id="pref-timer-default-minutes"
+                  class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4] bg-white cursor-pointer">
+                  <option value="15">15 minutes (Quick Sprint)</option>
+                  <option value="25" selected>25 minutes (Standard Pomodoro)</option>
+                  <option value="45">45 minutes (Deep Work Session)</option>
+                  <option value="60">60 minutes (Comprehensive Study)</option>
+                  <option value="90">90 minutes (Extended Focus)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-[#172b4d]">
+                <input id="pref-timer-sound-enabled" type="checkbox" checked
+                  class="rounded border-[#DCDFE4] text-[#0c66e4] focus:ring-[#0c66e4]">
+                <span>Play gentle audio chime when countdown reaches 0:00</span>
+              </label>
+
+              <button type="button" onclick="Settings.testChimeSound()"
+                class="px-3 py-1 rounded border border-[#DCDFE4] hover:bg-[#F1F2F4] text-xs font-medium text-[#172b4d] transition cursor-pointer flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-[#0c66e4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                <span>Test Chime</span>
+              </button>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="px-4 py-2 bg-[#0c66e4] hover:bg-[#0055cc] text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+                Save Timer Preferences
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 4. Data Export & Portable Backups -->
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-6 shadow-xs">
+          <div class="pb-3 mb-4 border-b border-[#DCDFE4]">
+            <h3 class="font-semibold text-lg text-[#172b4d]">Data Export & Portable Backups</h3>
+            <p class="text-xs text-[#626f86] mt-0.5">Export your notes or archive your entire study workspace to carry anywhere.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-xl border border-[#DCDFE4] bg-[#F7F8F9] flex flex-col justify-between">
+              <div>
+                <h4 class="font-semibold text-sm text-[#172b4d]">Export All Personal Notes</h4>
+                <p class="text-xs text-[#626f86] mt-1">Download all your handwritten notes and summaries formatted in clean Markdown, organized by subject and topic.</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-[#DCDFE4]">
+                <button onclick="Settings.exportAllNotes()" class="px-3.5 py-1.5 bg-white border border-[#DCDFE4] hover:border-[#0c66e4] text-[#0c66e4] font-semibold text-xs rounded-lg transition cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  <span>Export Notes (.md)</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-[#DCDFE4] bg-[#F7F8F9] flex flex-col justify-between">
+              <div>
+                <h4 class="font-semibold text-sm text-[#172b4d]">Export Curriculum Summary</h4>
+                <p class="text-xs text-[#626f86] mt-1">Export your structured subject outlines, chapter topics, and progress tracking records in portable JSON format.</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-[#DCDFE4]">
+                <button onclick="Settings.exportCurriculumMetadata()" class="px-3.5 py-1.5 bg-white border border-[#DCDFE4] hover:border-[#0c66e4] text-[#0c66e4] font-semibold text-xs rounded-lg transition cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  <span>Export Curriculum (.json)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Local Database Backup & Restore Card -->
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-6 shadow-xs">
+          <div class="flex items-center justify-between pb-4 border-b border-[#DCDFE4]">
+            <div>
+              <h3 class="font-semibold text-lg text-[#172b4d]">Local Database Snapshot & Restore</h3>
+              <p class="text-xs text-[#626f86] mt-0.5">Archive all SQLite data and uploaded documents into a portable ZIP file.</p>
+            </div>
+            <button onclick="Settings.createBackup()" class="px-4 py-2 bg-[#0c66e4] hover:bg-[#0055cc] text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+              Create Backup Now
+            </button>
+          </div>
+
+          <div class="mt-4">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-[#626f86] mb-2">Available Backups</h4>
+            <div id="backups-list-container" class="space-y-2"></div>
+          </div>
+        </div>
+
+        <!-- 6. System Health & Storage Diagnostics -->
+        <div class="bg-white rounded-xl border border-[#DCDFE4] p-6 shadow-xs">
+          <h3 class="font-semibold text-lg text-[#172b4d] mb-1">System Health & Storage</h3>
+          <p class="text-xs text-[#626f86] mb-4">Diagnostics for local database integrity, file storage utilization, and engine status.</p>
+          <div id="settings-diagnostics-container"></div>
+        </div>
+      </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 space-y-2 z-50 pointer-events-none"></div>
+
+  <!-- ======================== ALL MODALS ======================== -->
+
+  <!-- Modal 1: Stopwatch & Custom Study Timer Modal -->
+  <div id="timer-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" style="display: none;">
+    <div class="bg-white rounded-2xl shadow-2xl border border-[#DCDFE4] w-full max-w-sm overflow-hidden p-6 text-center" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-3 border-b border-[#DCDFE4]">
+        <h3 class="font-semibold text-[#172b4d] text-sm">Study Timer & Stopwatch</h3>
+        <button type="button" onclick="window.TimerWidget && window.TimerWidget.closeModal()" class="text-[#626f86] hover:text-[#172b4d] text-sm p-1 rounded cursor-pointer">✕</button>
+      </div>
+
+      <!-- Mode Selector -->
+      <div class="flex justify-center border-b border-[#DCDFE4] gap-6 my-4">
+        <button type="button" id="timer-tab-countdown" onclick="window.TimerWidget && window.TimerWidget.setMode('timer')"
+          class="pb-2 border-b-2 border-[#0c66e4] font-semibold text-[#0c66e4] text-xs transition cursor-pointer">
+          Set Timer
+        </button>
+        <button type="button" id="timer-tab-stopwatch" onclick="window.TimerWidget && window.TimerWidget.setMode('stopwatch')"
+          class="pb-2 border-b-2 border-transparent text-[#626f86] hover:text-[#172b4d] text-xs transition cursor-pointer">
+          Free Stopwatch
+        </button>
+      </div>
+
+      <!-- Big Timer Display -->
+      <div class="my-6">
+        <h1 id="modal-timer-digits" class="text-5xl font-extrabold text-[#172b4d] tracking-tight font-mono">25:00</h1>
+      </div>
+
+      <!-- Quick Preset & Custom Minutes (Shown in Countdown/Timer Mode) -->
+      <div id="timer-countdown-controls" class="space-y-3 mb-6">
+        <label class="text-xs font-semibold text-[#626f86] block">Set Target Duration:</label>
+        <div class="grid grid-cols-5 gap-1.5 text-xs">
+          <button type="button" id="timer-preset-5" onclick="window.TimerWidget && window.TimerWidget.setPresetMinutes(5)" class="py-1.5 rounded-lg border border-[#DCDFE4] hover:bg-[#F1F2F4] text-[#172b4d] font-medium text-xs transition cursor-pointer">5m</button>
+          <button type="button" id="timer-preset-15" onclick="window.TimerWidget && window.TimerWidget.setPresetMinutes(15)" class="py-1.5 rounded-lg border border-[#DCDFE4] hover:bg-[#F1F2F4] text-[#172b4d] font-medium text-xs transition cursor-pointer">15m</button>
+          <button type="button" id="timer-preset-25" onclick="window.TimerWidget && window.TimerWidget.setPresetMinutes(25)" class="py-1.5 rounded-lg bg-[#E9F2FF] border border-[#0c66e4] text-[#0c66e4] font-semibold text-xs transition cursor-pointer">25m</button>
+          <button type="button" id="timer-preset-45" onclick="window.TimerWidget && window.TimerWidget.setPresetMinutes(45)" class="py-1.5 rounded-lg border border-[#DCDFE4] hover:bg-[#F1F2F4] text-[#172b4d] font-medium text-xs transition cursor-pointer">45m</button>
+          <button type="button" id="timer-preset-60" onclick="window.TimerWidget && window.TimerWidget.setPresetMinutes(60)" class="py-1.5 rounded-lg border border-[#DCDFE4] hover:bg-[#F1F2F4] text-[#172b4d] font-medium text-xs transition cursor-pointer">60m</button>
+        </div>
+        <div class="flex items-center justify-center gap-2 pt-1 text-xs">
+          <span class="text-[#626f86] text-xs">Or set custom:</span>
+          <input type="number" id="timer-custom-minutes" min="1" max="360" value="25"
+            oninput="window.TimerWidget && window.TimerWidget.setCustomMinutes(this.value)"
+            class="w-16 p-1 border border-[#DCDFE4] rounded text-center text-xs font-semibold focus:outline-[#0c66e4] text-[#172b4d]">
+          <span class="text-[#626f86] text-xs">minutes</span>
+        </div>
+      </div>
+
+      <!-- Controls: Start / Pause & Reset -->
+      <div class="flex items-center justify-center gap-3">
+        <button type="button" id="modal-timer-start-btn" onclick="window.TimerWidget && window.TimerWidget.togglePlay()"
+          class="px-6 py-2.5 rounded-lg bg-[#0c66e4] hover:bg-[#0055cc] text-white font-semibold text-xs shadow-xs transition cursor-pointer">
+          Start
+        </button>
+        <button type="button" onclick="window.TimerWidget && window.TimerWidget.reset()"
+          class="px-5 py-2.5 rounded-lg border border-[#DCDFE4] hover:bg-[#F1F2F4] text-[#172b4d] font-semibold text-xs transition cursor-pointer">
+          Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Add Study Material Modal -->
+  <div id="add-material-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-2xl border border-[#DCDFE4] w-full max-w-lg overflow-hidden">
+      <div class="p-5 border-b border-[#DCDFE4] flex items-center justify-between">
+        <h3 class="font-semibold text-[#172b4d] text-base">Add Study Material</h3>
+        <button data-close-modal class="text-[#626f86] hover:text-[#172b4d] text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="flex border-b border-[#DCDFE4] px-5 pt-3 gap-6">
+        <button id="tab-upload-btn" onclick="App.switchAddMaterialTab('upload')"
+          class="pb-2 border-b-2 border-[#0c66e4] font-semibold text-[#0c66e4] text-xs cursor-pointer">
+          Upload From Computer
+        </button>
+        <button id="tab-web-btn" onclick="App.switchAddMaterialTab('web')"
+          class="pb-2 border-b-2 border-transparent text-[#626f86] hover:text-[#172b4d] text-xs cursor-pointer">
+          Import Web Article / Video Link
+        </button>
+      </div>
+
+      <div class="p-5">
+        <!-- Contextual Breadcrumb Tag (shown when opened from a specific topic/subject) -->
+        <div id="add-material-context-banner" class="hidden mb-4 p-2.5 rounded-lg bg-[#E9F2FF] border border-[#B3D4FF] text-xs text-[#0c66e4] font-medium flex items-center justify-between"></div>
+
+        <!-- Option A: File Upload Pane -->
+        <div id="pane-upload-file">
+          <form id="form-upload-file" class="space-y-4">
+            <div>
+              <label class="text-xs font-semibold text-[#172b4d] block mb-1">Select Document File</label>
+              <input id="upload-file-input" type="file"
+                accept=".pdf,.docx,.pptx,.txt,.md,.xlsx"
+                class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] bg-[#F7F8F9] file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#E9F2FF] file:text-[#0c66e4] hover:file:bg-blue-100 cursor-pointer">
+              <span class="text-xs text-[#626f86] block mt-1">Supported: PDF, Word (DOCX), PowerPoint (PPTX), Markdown, Text, Excel (XLSX).</span>
+            </div>
+
+            <div>
+              <label class="text-xs font-semibold text-[#172b4d] block mb-1">Custom Title (Optional)</label>
+              <input id="upload-file-title" type="text" placeholder="Defaults to filename"
+                class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Assign Subject</label>
+                <select id="upload-file-subject" onchange="App.onSubjectChange('upload')" class="subject-select-picker w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+                  <option value="">-- Unassigned --</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Assign Topic (Optional)</label>
+                <select id="upload-file-topic" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+                  <option value="">-- Choose Subject First --</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-semibold text-[#172b4d] block mb-1">Tags (Optional)</label>
+              <input id="upload-file-tags" type="text" placeholder="e.g. Exam, Chapter 2"
+                class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+            </div>
+
+            <div class="pt-2 flex justify-end gap-2">
+              <button type="button" data-close-modal class="px-4 py-2 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Cancel</button>
+              <button type="submit" id="upload-submit-btn" class="px-5 py-2 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">
+                Upload & Extract
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Option B: Web & Video Import Pane -->
+        <div id="pane-import-web" class="hidden">
+          <form id="form-import-web" class="space-y-4">
+            <div>
+              <label class="text-xs font-semibold text-[#172b4d] block mb-1">Webpage or Video URL</label>
+              <input id="import-url-input" type="url" placeholder="https://en.wikipedia.org/... or https://youtube.com/..."
+                class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+              <span class="text-xs text-[#626f86] block mt-1">Articles are cleaned of ads and navigation. Video resources are saved with title and links.</span>
+            </div>
+
+            <div>
+              <label class="text-xs font-semibold text-[#172b4d] block mb-1">Custom Title (Optional)</label>
+              <input id="import-url-title" type="text" placeholder="Defaults to page title"
+                class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Assign Subject</label>
+                <select id="import-url-subject" onchange="App.onSubjectChange('web')" class="subject-select-picker w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+                  <option value="">-- Unassigned --</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-[#172b4d] block mb-1">Assign Topic (Optional)</label>
+                <select id="import-url-topic" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+                  <option value="">-- Choose Subject First --</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-semibold text-[#172b4d] block mb-1">Tags (Optional)</label>
+              <input id="import-url-tags" type="text" placeholder="e.g. Research, Web"
+                class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+            </div>
+
+            <div class="pt-2 flex justify-end gap-2">
+              <button type="button" data-close-modal class="px-4 py-2 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Cancel</button>
+              <button type="submit" id="import-url-submit-btn" class="px-5 py-2 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">
+                Import Content
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Create Subject -->
+  <div id="create-subject-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#DCDFE4] w-full max-w-md p-5">
+      <h3 class="font-semibold text-[#172b4d] text-base mb-4">Create New Subject</h3>
+      <form onsubmit="event.preventDefault(); API.createSubject({ name: document.getElementById('new-sub-name').value, description: document.getElementById('new-sub-desc').value, color: document.getElementById('new-sub-color').value }).then(() => { State.toast('Subject created', 'success'); document.getElementById('create-subject-modal').classList.add('hidden'); Subjects.load(); })" class="space-y-3">
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Subject Name</label>
+          <input id="new-sub-name" type="text" required placeholder="e.g. Computer Science" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Description (Optional)</label>
+          <input id="new-sub-desc" type="text" placeholder="Short description" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Color Theme</label>
+          <input id="new-sub-color" type="color" value="#0c66e4" class="w-12 h-8 p-0 rounded border border-[#DCDFE4] cursor-pointer">
+        </div>
+        <div class="pt-3 flex justify-end gap-2">
+          <button type="button" data-close-modal class="px-3 py-1.5 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: Safe Delete Modal (Folder Deletion Choice) -->
+  <div id="safe-delete-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#DCDFE4] w-full max-w-md p-6">
+      <input type="hidden" id="safe-delete-entity-type">
+      <input type="hidden" id="safe-delete-entity-id">
+
+      <h3 class="font-semibold text-[#172b4d] text-base mb-2">Confirm Folder Deletion</h3>
+      <p id="safe-delete-prompt-text" class="text-xs text-[#44546f] leading-relaxed mb-6"></p>
+
+      <div class="space-y-2">
+        <button onclick="Subjects.executeSafeDelete('unassign')"
+          class="w-full p-3 text-left rounded-xl border border-[#0c66e4]/30 bg-[#E9F2FF] hover:bg-blue-100 transition text-xs font-semibold text-[#0c66e4] flex items-center justify-between cursor-pointer">
+          <div>
+            <span>Keep study materials safe (Recommended)</span>
+            <span class="block text-xs font-normal text-[#626f86] mt-0.5">Removes the folder but preserves your documents as unassigned.</span>
+          </div>
+        </button>
+
+        <button onclick="Subjects.executeSafeDelete('cascade')"
+          class="w-full p-3 text-left rounded-xl border border-rose-200 bg-rose-50/50 hover:bg-rose-50 transition text-xs font-semibold text-rose-900 flex items-center justify-between cursor-pointer">
+          <div>
+            <span>Delete everything inside this folder</span>
+            <span class="block text-xs font-normal text-[#626f86] mt-0.5">Destroys the folder and all associated materials and notes.</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-[#DCDFE4] flex justify-end">
+        <button data-close-modal class="px-4 py-1.5 text-xs text-[#626f86] hover:text-[#172b4d] cursor-pointer">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Rename Material Modal -->
+  <div id="rename-material-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#DCDFE4] w-full max-w-sm p-5">
+      <h3 class="font-semibold text-[#172b4d] text-base mb-3">Rename Material</h3>
+      <form onsubmit="Library.submitRename(event)" class="space-y-3">
+        <input type="hidden" id="rename-material-id">
+        <input id="rename-material-input" type="text" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal class="px-3 py-1.5 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 6: Move Material Modal -->
+  <div id="move-material-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#DCDFE4] w-full max-w-sm p-5">
+      <h3 class="font-semibold text-[#172b4d] text-base mb-3">Move Material</h3>
+      <form onsubmit="Library.submitMove(event)" class="space-y-3">
+        <input type="hidden" id="move-material-id">
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Subject</label>
+          <select id="move-material-subject" onchange="App.onSubjectChange('move')" class="subject-select-picker w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+            <option value="">-- Unassigned --</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Topic (Optional)</label>
+          <select id="move-material-topic" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+            <option value="">-- No Topic (Subject Level) --</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal class="px-3 py-1.5 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">Move</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 7: Create Chapter Modal -->
+  <div id="create-chapter-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#DCDFE4] w-full max-w-sm p-5">
+      <h3 class="font-semibold text-[#172b4d] text-base mb-3">Add Chapter</h3>
+      <form onsubmit="event.preventDefault(); API.createChapter({ subject_id: parseInt(document.getElementById('create-chapter-subject-id').value), name: document.getElementById('new-chap-name').value }).then(() => { State.toast('Chapter added', 'success'); document.getElementById('create-chapter-modal').classList.add('hidden'); Subjects.load(); })" class="space-y-3">
+        <input type="hidden" id="create-chapter-subject-id">
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Chapter Name</label>
+          <input id="new-chap-name" type="text" required placeholder="e.g. Chapter 1: Foundations" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal class="px-3 py-1.5 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 8: Create Topic Modal -->
+  <div id="create-topic-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#DCDFE4] w-full max-w-sm p-5">
+      <h3 class="font-semibold text-[#172b4d] text-base mb-3">Add Topic</h3>
+      <form onsubmit="event.preventDefault(); API.createTopic({ chapter_id: parseInt(document.getElementById('create-topic-chapter-id').value), name: document.getElementById('new-top-name').value }).then(() => { State.toast('Topic added', 'success'); document.getElementById('create-topic-modal').classList.add('hidden'); Subjects.load(); })" class="space-y-3">
+        <input type="hidden" id="create-topic-chapter-id">
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Topic Name</label>
+          <input id="new-top-name" type="text" required placeholder="e.g. Memory Management" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d] focus:outline-[#0c66e4]">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal class="px-3 py-1.5 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 9: Bulk Quiz AI Review Modal -->
+  <div id="bulk-quiz-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-2xl border border-[#DCDFE4] w-full max-w-2xl max-h-[85vh] flex flex-col p-6">
+      <div class="flex items-center justify-between pb-3 border-b border-[#DCDFE4]">
+        <h3 class="font-semibold text-[#172b4d] text-base">Review AI-Generated Quiz (10 Questions)</h3>
+        <button data-close-modal class="text-[#626f86] hover:text-[#172b4d] cursor-pointer">✕</button>
+      </div>
+      <div class="my-2">
+        <label class="text-xs font-semibold text-[#172b4d] block mb-1">Quiz Title:</label>
+        <input id="bulk-quiz-title" type="text" class="w-full text-xs p-2 rounded border border-[#DCDFE4] font-semibold text-[#172b4d]">
+      </div>
+      <div id="bulk-quiz-list" class="flex-1 overflow-y-auto space-y-3 my-2 pr-1"></div>
+      <div class="pt-3 border-t border-[#DCDFE4] flex justify-end gap-2">
+        <button data-close-modal class="px-3 py-1.5 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Discard</button>
+        <button onclick="Quizzes.saveGeneratedQuiz(false)" class="px-3.5 py-1.5 border border-[#0c66e4] text-[#0c66e4] hover:bg-blue-50 text-xs font-semibold rounded-lg transition cursor-pointer">Save to Library</button>
+        <button onclick="Quizzes.saveGeneratedQuiz(true)" class="px-4 py-1.5 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer flex items-center gap-1.5">
+          <span>Start Quiz Now</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 10: Create Quiz Modal -->
+  <div id="create-quiz-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#DCDFE4] w-full max-w-md p-5">
+      <h3 class="font-semibold text-[#172b4d] text-base mb-3">Create Practice Quiz</h3>
+      <form onsubmit="event.preventDefault(); API.createQuiz({ title: document.getElementById('new-quiz-title').value, description: document.getElementById('new-quiz-desc').value, difficulty: document.getElementById('new-quiz-diff').value, questions: [{ question_type: 'mcq', question_text: document.getElementById('new-quiz-sample-q').value, options: ['Option A', 'Option B', 'Option C', 'Option D'], correct_answer: 'Option A', explanation: 'Correct answer explanation' }] }).then(() => { State.toast('Quiz created!', 'success'); document.getElementById('create-quiz-modal').classList.add('hidden'); Quizzes.load(); })" class="space-y-3">
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Quiz Title</label>
+          <input id="new-quiz-title" type="text" required placeholder="e.g. Operating Systems Quiz 1" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d]">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Description</label>
+          <input id="new-quiz-desc" type="text" placeholder="Short description" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d]">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Difficulty</label>
+          <select id="new-quiz-diff" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d]">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">First Question Text</label>
+          <input id="new-quiz-sample-q" type="text" required placeholder="What is the primary function of an OS?" class="w-full text-xs p-2.5 rounded-lg border border-[#DCDFE4] text-[#172b4d]">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal class="px-3 py-1.5 border border-[#DCDFE4] text-xs text-[#172b4d] rounded-lg hover:bg-[#F1F2F4] cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-1.5 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 11: Generate AI Practice Quiz Modal -->
+  <div id="ai-quiz-generate-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#dcdfe4] w-full max-w-md p-5">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-[#f1f2f4]">
+        <h3 class="font-semibold text-[#172b4d] text-base">Generate AI Practice Quiz</h3>
+        <button data-close-modal class="text-[#626f86] hover:text-[#172b4d] text-sm cursor-pointer p-1">✕</button>
+      </div>
+
+      <form onsubmit="Quizzes.submitAIGeneratorForm(event)" class="space-y-3.5">
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Select Topic</label>
+          <select id="ai-quiz-topic-select" class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+            <option value="">Select Topic / Context...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Or Specific Topic / Key Concept (Optional)</label>
+          <input id="ai-quiz-custom-topic" type="text" placeholder="e.g. Memory Management & Paging algorithms"
+            class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-semibold text-[#172b4d] block mb-1">Starting Difficulty</label>
+            <select id="ai-quiz-diff-select" class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+              <option value="easy" selected>Level 1 - Easy</option>
+              <option value="medium">Level 2 - Medium</option>
+              <option value="hard">Level 3 - Hard</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-[#172b4d] block mb-1">Questions</label>
+            <input type="text" value="10 Questions (4 options)" disabled
+              class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] bg-[#f1f2f4] text-[#44546f] font-medium cursor-not-allowed">
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-blue-50/70 rounded-lg border border-blue-100 text-xs text-[#0c66e4] space-y-1">
+          <p class="font-semibold">Adaptive Progression Enabled:</p>
+          <p class="text-[11px] text-[#44546f]">Answers will be shown at the last of the quiz. A "Continue" button will let you advance difficulty and generate 10 more questions on the same topic.</p>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" data-close-modal class="px-3.5 py-2 border border-[#dcdfe4] text-xs font-semibold text-[#172b4d] rounded-lg hover:bg-[#f1f2f4] cursor-pointer">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-[#0c66e4] hover:bg-[#0055cc] text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>Generate & Start Quiz</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Overlay: Quiz Session & Scoring Overlay -->
+  <div id="quiz-session-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-2xl border border-[#DCDFE4] w-full max-w-3xl max-h-[90vh] flex flex-col p-6 overflow-hidden">
+      <div class="flex items-center justify-between pb-4 border-b border-[#DCDFE4]">
+        <div class="flex items-center gap-2.5">
+          <button onclick="Quizzes.closeQuizSession()" title="Go back to quizzes"
+            class="px-2.5 py-1 rounded-md border border-[#DCDFE4] hover:bg-[#F1F2F4] text-xs font-semibold text-[#172b4d] flex items-center gap-1 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-[#626f86]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <span>Back</span>
+          </button>
+          <h3 id="quiz-session-title" class="font-semibold text-[#172b4d] text-lg">Practice Assessment</h3>
+        </div>
+        <button onclick="Quizzes.closeQuizSession()" class="text-[#626f86] hover:text-[#172b4d] text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div id="quiz-session-body" class="flex-1 overflow-y-auto py-4 pr-1"></div>
+    </div>
+  </div>
+
+  <!-- Modal: Maximized AI Summary & Explanation Viewer -->
+  <div id="ai-result-max-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-2xl border border-[#DCDFE4] w-full max-w-4xl max-h-[90vh] flex flex-col p-6 overflow-hidden">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3.5 mb-2 border-b border-[#DCDFE4]">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#0c66e4] flex items-center justify-center font-bold shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </div>
+          <div>
+            <h3 id="ai-result-max-title" class="font-bold text-[#172b4d] text-base sm:text-lg">Study Guide</h3>
+            <p id="ai-result-max-subtitle" class="text-xs text-[#626f86]">Comprehensive humanized explanation</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="StudyRoom.copyAIResult()" title="Copy to clipboard"
+            class="px-3 py-1.5 rounded-lg border border-[#DCDFE4] hover:bg-[#F1F2F4] text-xs font-semibold text-[#44546f] hover:text-[#172b4d] flex items-center gap-1.5 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span>Copy</span>
+          </button>
+          <button onclick="StudyRoom.saveAIResultAsNote()" title="Save as a note"
+            class="px-3 py-1.5 rounded-lg bg-[#E9F2FF] hover:bg-blue-100 text-xs font-semibold text-[#0c66e4] flex items-center gap-1.5 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+            <span>Save to Notes</span>
+          </button>
+          <button onclick="StudyRoom.minimizeAIResult()" title="Minimize / Close" aria-label="Close"
+            class="p-2 rounded-lg text-[#626f86] hover:text-[#172b4d] hover:bg-[#F1F2F4] transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Spacious Reading Stage) -->
+      <div class="flex-1 overflow-y-auto py-3 px-1 space-y-4">
+        <div id="ai-result-max-content" class="leading-relaxed text-sm sm:text-base text-[#172b4d] space-y-3"></div>
+        <div id="ai-result-max-citations" class="mt-4 pt-3 border-t border-[#DCDFE4] text-xs text-[#626f86] hidden"></div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-3.5 border-t border-[#DCDFE4] flex items-center justify-between">
+        <span class="text-xs text-[#626f86]">Grounded in your study material</span>
+        <button onclick="StudyRoom.minimizeAIResult()"
+          class="px-4 py-2 bg-[#0c66e4] hover:bg-[#0055cc] text-white text-xs font-semibold rounded-lg transition cursor-pointer">
+          Done Reading
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Mark / Edit Event & Important Date -->
+  <div id="calendar-event-modal" class="modal-container hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#dcdfe4] w-full max-w-md p-5">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-[#f1f2f4]">
+        <h3 id="calendar-modal-title" class="font-semibold text-[#172b4d] text-base">Mark Event / Important Date</h3>
+        <button onclick="CalendarView.closeEventModal()" class="text-[#626f86] hover:text-[#172b4d] text-sm cursor-pointer p-1">✕</button>
+      </div>
+
+      <form onsubmit="CalendarView.saveEvent(event)" class="space-y-3">
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Title / Milestone Name <span class="text-red-500">*</span></label>
+          <input id="cal-input-title" type="text" required placeholder="e.g. Product Strategy Final Exam"
+            class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-semibold text-[#172b4d] block mb-1">Date <span class="text-red-500">*</span></label>
+            <input id="cal-input-date" type="date" required
+              class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-[#172b4d] block mb-1">Time (Optional)</label>
+            <input id="cal-input-time" type="time"
+              class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-semibold text-[#172b4d] block mb-1">Category</label>
+            <select id="cal-input-category" class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+              <option value="exam">Exam / Test</option>
+              <option value="deadline">Important Deadline</option>
+              <option value="assignment">Assignment / Project</option>
+              <option value="milestone">Milestone Goal</option>
+              <option value="revision">Revision / Study</option>
+              <option value="event" selected>General Event</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-[#172b4d] block mb-1">Priority</label>
+            <select id="cal-input-priority" class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+              <option value="normal" selected>Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Link to Subject Search -->
+          <div>
+            <label class="text-xs font-semibold text-[#172b4d] block mb-1">Link to Subject (Optional)</label>
+            <input type="hidden" id="cal-selected-subject-id" value="">
+            
+            <div id="cal-subject-selected-chip" class="hidden"></div>
+
+            <div class="relative" id="cal-subject-search-container">
+              <div class="relative">
+                <input id="cal-search-subject-input" type="text"
+                  placeholder="Type to search subject..."
+                  autocomplete="off"
+                  oninput="CalendarView.onSearchSubject(this.value)"
+                  onfocus="CalendarView.onSearchSubject(this.value)"
+                  class="w-full text-xs p-2.5 pl-8 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+                <svg class="w-3.5 h-3.5 text-[#626f86] absolute left-2.5 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <div id="cal-subject-search-results" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-[#dcdfe4] rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto"></div>
+            </div>
+          </div>
+
+          <!-- Link to Topic Search -->
+          <div>
+            <label class="text-xs font-semibold text-[#172b4d] block mb-1">Link to Topic (Optional)</label>
+            <input type="hidden" id="cal-selected-topic-id" value="">
+
+            <div id="cal-topic-selected-chip" class="hidden"></div>
+
+            <div class="relative" id="cal-topic-search-container">
+              <div class="relative">
+                <input id="cal-search-topic-input" type="text"
+                  placeholder="Type to search topic..."
+                  autocomplete="off"
+                  oninput="CalendarView.onSearchTopic(this.value)"
+                  onfocus="CalendarView.onSearchTopic(this.value)"
+                  class="w-full text-xs p-2.5 pl-8 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]">
+                <svg class="w-3.5 h-3.5 text-[#626f86] absolute left-2.5 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <div id="cal-topic-search-results" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-[#dcdfe4] rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-[#172b4d] block mb-1">Notes / Description (Optional)</label>
+          <textarea id="cal-input-description" rows="3" placeholder="Add syllabus scope, instructions, or study goals..."
+            class="w-full text-xs p-2.5 rounded-lg border border-[#dcdfe4] text-[#172b4d] focus:outline-[#0c66e4]"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2 border-t border-[#f1f2f4]">
+          <button type="button" onclick="CalendarView.closeEventModal()" class="px-4 py-2 border border-[#dcdfe4] text-xs text-[#172b4d] rounded-lg hover:bg-[#f1f2f4] cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 bg-[#0c66e4] text-white text-xs font-semibold rounded-lg hover:bg-[#0055cc] transition cursor-pointer">
+            Save Event
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="/js/api.js?v=26"></script>
+  <script src="/js/state.js?v=26"></script>
+  <script src="/js/timer.js?v=26"></script>
+  <script src="/js/dashboard.js?v=26"></script>
+  <script src="/js/library.js?v=26"></script>
+  <script src="/js/subjects.js?v=26"></script>
+  <script src="/js/study_room.js?v=26"></script>
+  <script src="/js/notes.js?v=26"></script>
+  <script src="/js/quizzes.js?v=26"></script>
+  <script src="/js/progress.js?v=26"></script>
+  <script src="/js/calendar.js?v=26"></script>
+  <script src="/js/settings.js?v=26"></script>
+  <script src="/js/app.js?v=26"></script>
+</body>
+</html>

@@ -6,7 +6,13 @@ from pathlib import Path
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data"
+
+# In serverless environments (Vercel, AWS Lambda), root filesystem is read-only; use /tmp
+if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+    DATA_DIR = Path("/tmp/studyspace_data")
+else:
+    DATA_DIR = BASE_DIR / "data"
+
 UPLOADS_DIR = DATA_DIR / "uploads"
 BACKUPS_DIR = DATA_DIR / "backups"
 DB_PATH = DATA_DIR / "studyspace.db"

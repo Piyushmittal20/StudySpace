@@ -1,0 +1,20 @@
+# Dependencies & Environments
+venv/
+env/
+.pytest_cache/
+tests/
+__pycache__/
+*.pyc
+
+# Local databases and secrets
+*.db
+*.sqlite3
+.env
+.env.*
+!.env.example
+
+# Uploads & Backups runtime files
+data/uploads/*
+!data/uploads/.gitkeep
+data/backups/*
+!data/backups/.gitkeep

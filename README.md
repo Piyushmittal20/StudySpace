@@ -2,7 +2,9 @@
 
 > **Everything you study, organized in one place and easier to understand.**
 
-StudySpace is a modern, privacy-focused, personal learning platform designed to help you collect, organize, understand, revise, and practice everything you learn. It eliminates study clutter by bringing local documents, educational webpages, online videos, personal notes, flashcards, and quizzes together into one unified, distraction-free environment.
+🌐 **Live Vercel Application**: [https://study-space-xi-six.vercel.app](https://study-space-xi-six.vercel.app)  
+📖 **Interactive API Documentation**: [https://study-space-xi-six.vercel.app/docs](https://study-space-xi-six.vercel.app/docs)  
+📦 **GitHub Repository**: [https://github.com/Piyushmittal20/StudySpace](https://github.com/Piyushmittal20/StudySpace)
 
 ---
 
@@ -154,29 +156,29 @@ Copy-Item .env.example .env
 
 ---
 
-## ▶ Running StudySpace
+## 🌐 Accessing StudySpace
+
+### 1. Live Web Application (Permanent Vercel Link)
+StudySpace is deployed and available globally via Vercel:
+- 👉 **Web Application**: **[https://study-space-xi-six.vercel.app](https://study-space-xi-six.vercel.app)**
+- 👉 **Interactive API Docs (Swagger UI)**: **[https://study-space-xi-six.vercel.app/docs](https://study-space-xi-six.vercel.app/docs)**
+
+---
+
+## 💻 Running Locally (Optional)
+
+If you prefer running StudySpace offline on your local computer:
 
 ### 1. Start the Backend Server
-With the virtual environment active, run:
+With your Python virtual environment active, run:
 
 ```powershell
 uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-You will see:
-```text
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Initializing StudySpace database...
-INFO:     StudySpace startup complete.
-```
-
-### 2. Open StudySpace in Your Browser
-Open your web browser and visit:
-👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
-
-### 3. Interactive FastAPI Documentation
-To explore and test all REST endpoints directly in your browser with interactive Swagger UI:
-👉 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
+### 2. Open Local Instance in Browser
+- 👉 **Local App**: **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+- 👉 **Local API Docs**: **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
 
 ---
 

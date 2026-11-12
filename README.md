@@ -2,8 +2,8 @@
 
 > **Everything you study, organized in one place and easier to understand.**
 
-🌐 **Live Vercel Application**: [https://study-space-xi-six.vercel.app](https://study-space-xi-six.vercel.app)  
-📖 **Interactive API Documentation**: [https://study-space-xi-six.vercel.app/docs](https://study-space-xi-six.vercel.app/docs)  
+🌐 **Live Vercel Application**: [https://study-space-blue.vercel.app](https://study-space-blue.vercel.app)  
+📖 **Interactive API Documentation**: [https://study-space-blue.vercel.app/docs](https://study-space-blue.vercel.app/docs)  
 📦 **GitHub Repository**: [https://github.com/Piyushmittal20/StudySpace](https://github.com/Piyushmittal20/StudySpace)
 
 ---
@@ -160,8 +160,8 @@ Copy-Item .env.example .env
 
 ### 1. Live Web Application (Permanent Vercel Link)
 StudySpace is deployed and available globally via Vercel:
-- 👉 **Web Application**: **[https://study-space-xi-six.vercel.app](https://study-space-xi-six.vercel.app)**
-- 👉 **Interactive API Docs (Swagger UI)**: **[https://study-space-xi-six.vercel.app/docs](https://study-space-xi-six.vercel.app/docs)**
+- 👉 **Web Application**: **[https://study-space-blue.vercel.app](https://study-space-blue.vercel.app)**
+- 👉 **Interactive API Docs (Swagger UI)**: **[https://study-space-blue.vercel.app/docs](https://study-space-blue.vercel.app/docs)**
 
 ---
 
